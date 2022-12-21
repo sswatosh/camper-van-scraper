@@ -17,6 +17,8 @@ all_fields = [
     "createdAt",
     "videoUrl",
     "messagingMode",
+    "make",
+    "model"
 ]
 
 select_fields = [
@@ -26,11 +28,15 @@ select_fields = [
     "odometer",
     "year",
     "fuel",
+    "make",
+    "model",
     "isSold"
 ]
 
 csv_fields = [
     "title",
+    "make",
+    "model",
     "price",
     "odometer",
     "year",
