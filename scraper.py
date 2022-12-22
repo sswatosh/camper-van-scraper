@@ -47,6 +47,12 @@ csv_fields = [
 
 query_limit = 50
 
+include_distance = True
+location = (39.833, -98.585)
+distance = 500  # miles
+if include_distance:
+    csv_fields.insert(-1, "distance")
+
 
 def main():
     base_query_params = get_base_query_params(select_fields)
@@ -97,12 +103,24 @@ def get_page(base_params, page):
 
 def get_base_query_params(fields):
     query_params = {}
+
+    if include_distance:
+        query_params["$modify[0]"] = "maxDistance"
+        query_params["$modify[1]"] = location[0]
+        query_params["$modify[2]"] = location[1]
+        query_params["$modify[3]"] = distance
+
     for index, field in enumerate(fields):
         # fields to include are written as $select[0]=currency"
         query_params[f"$select[{index}]"] = field
 
     query_params["$sort[isSold]"] = 1
-    query_params["$sort[createdAt]"] = -1
+
+    if include_distance:
+        query_params["$sort[distance]"] = 1
+    else:
+        query_params["$sort[createdAt]"] = -1
+
     query_params["countryCode[$ilike]"] = "%US%"
 
     return query_params
