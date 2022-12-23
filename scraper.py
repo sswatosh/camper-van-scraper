@@ -1,24 +1,74 @@
 import csv
 import requests
 
-all_fields = [
+basic_fields = [
     "id",
     "title",
+    "sellerType",
+    "lat",
+    "long",
+    "placeId",
+    "viewCount",
+    "description",
     "price",
+    "currency",
+    "type",
+    "year",
     "odometer",
     "odometerUnit",
-    "seats",
     "sleeps",
-    "year",
-    "fuel",
-    "currency",
-    "isSold",
-    "isPending",
-    "createdAt",
-    "videoUrl",
-    "messagingMode",
+    "roof",
     "make",
-    "model"
+    "model",
+    "fuel",
+    "fridge",
+    "sink",
+    "stove",
+    "oven",
+    "table",
+    "microwave",
+    "ac",
+    "airbags",
+    "solar",
+    "inverter",
+    "shower",
+    "extraStorage",
+    "backupCamera",
+    "ceilingFan",
+    "heater",
+    "toilet",
+    "generator",
+    "towHitch",
+    "tv",
+    "waterTank",
+    "levelingJacks",
+    "bikeRack",
+    "4wd",
+    "userId",
+    "createdAt",
+    "updatedAt",
+    "expiresAt",
+    "isSold",
+    "soldAt",
+    "isHidden",
+    "isFlagged",
+    "featureExpiresAt",
+    "featuredImageId",
+    "isFeatured",
+    "isPending",
+    "videoUrl",
+    "isSocialRepostingOk",
+    "wheelchairAccessible",
+    "isReviewed",
+    "originallyCreatedAt",
+    "seats",
+    "messagingMode",
+    "adminName1",
+    "countryCode",
+    "client",
+    "displayPrice",
+    "slug",
+    "isExpired"
 ]
 
 select_fields = [
@@ -39,6 +89,7 @@ csv_fields = [
     "model",
     "price",
     "odometer",
+    "place",
     "year",
     "fuel",
     "isSold",
@@ -73,6 +124,8 @@ def get_csv_row_from_entry(entry):
             row[field] = "https://thevancamper.com/post/" + str(entry["id"])
         elif field == "price":
             row[field] = entry[field] / 100
+        elif field == "place":
+            row[field] = entry["place"]["placeName"] + ", " + entry["place"]["adminName1"]
         else:
             row[field] = entry[field]
     return row
@@ -113,6 +166,9 @@ def get_base_query_params(fields):
     for index, field in enumerate(fields):
         # fields to include are written as $select[0]=currency"
         query_params[f"$select[{index}]"] = field
+
+    # also get location details
+    query_params["$eager"] = "[place(defaultSelects)]"
 
     query_params["$sort[isSold]"] = 1
 
