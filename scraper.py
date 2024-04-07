@@ -1,4 +1,5 @@
 import csv
+import re
 import requests
 
 basic_fields = [
@@ -80,7 +81,8 @@ select_fields = [
     "fuel",
     "make",
     "model",
-    "isSold"
+    "isSold",
+    "description"
 ]
 
 csv_fields = [
@@ -101,6 +103,8 @@ query_limit = 50
 include_distance = True
 location = (39.833, -98.585)
 distance = 500  # miles
+description_filter_regex = "promaster"
+
 if include_distance:
     csv_fields.insert(-1, "distance")
 
@@ -108,6 +112,8 @@ if include_distance:
 def main():
     base_query_params = get_base_query_params(select_fields)
     data = get_all_pages(base_query_params)
+    if description_filter_regex is not None:
+        data = filter_by_description(data)
 
     with open("vans.csv", "w", encoding="UTF-8", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=csv_fields)
@@ -188,6 +194,10 @@ def add_paging_to_base_params(query_params, limit, page):
     query_params["$skip"] = offset
 
     return query_params
+
+
+def filter_by_description(data):
+    return [item for item in data if re.search(description_filter_regex, item["description"], re.IGNORECASE)]
 
 
 if __name__ == "__main__":
